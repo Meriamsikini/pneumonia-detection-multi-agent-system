@@ -200,12 +200,6 @@ This project demonstrates:
 
 ---
 
-## 📜 License
-
-No license specified.
-For public sharing, consider adding **MIT** or **Apache 2.0**.
-
----
 
 ## 👤 Author
 
