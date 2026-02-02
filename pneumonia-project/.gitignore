@@ -1,0 +1,25 @@
+
+# Uploaded images
+uploads/
+
+# Prediction outputs
+data/test_predictions.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# IDE / Build
+target/
+.mvn/wrapper/maven-wrapper.jar
+.idea
+*.iws
+*.iml
+*.ipr

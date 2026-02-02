@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Agents Status - Medical AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Modern CSS -->
+    <style>
+        /* ============================================
+           DESIGN SYSTEM & CSS VARIABLES
+           ============================================ */
+        :root {
+            /* Color Palette - Medical/Tech Theme */
+            --primary: #0d6efd;
+            --primary-dark: #0a58ca;
+            --primary-light: #e7f1ff;
+            --secondary: #6c757d;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            
+            /* Semantic Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            
+            /* Agent Colors */
+            --agent-data: #06b6d4;
+            --agent-decision: #8b5cf6;
+            --agent-validation: #14b8a6;
+            --agent-alert: #f43f5e;
+            --agent-main: #eab308;
+            
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============================================
+           GLOBAL & RESET
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 0.875rem;
+            letter-spacing: -0.3px;
+        }
+
+        /* ============================================
+           LAYOUT & STRUCTURE
+           ============================================ */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-secondary);
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-xl);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+            padding-bottom: var(--spacing-xl);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-brand i {
+            font-size: 1.75rem;
+            color: #ff6b6b;
+        }
+
+        .sidebar-brand h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link i {
+            font-size: 1.125rem;
+            width: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: var(--spacing-2xl);
+        }
+
+        /* ============================================
+           HEADER & TITLE
+           ============================================ */
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .page-title i {
+            color: var(--primary);
+            font-size: 2.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ============================================
+           CARDS & COMPONENTS
+           ============================================ */
+        .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+            border-color: var(--primary-light);
+        }
+
+        .card-header {
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h5 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .card-header i {
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 var(--spacing-md) 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .card-title i {
+            font-size: 1.25rem;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            margin: 0 0 var(--spacing-lg) 0;
+            font-size: 0.9375rem;
+        }
+
+        /* ============================================
+           BADGES & STATUS
+           ============================================ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-lg);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .badge i {
+            font-size: 0.5rem;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ============================================
+           AGENT GRID
+           ============================================ */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .agent-card {
+            position: relative;
+            border-left: 4px solid var(--primary);
+        }
+
+        .agent-card.data { border-left-color: var(--agent-data); }
+        .agent-card.decision { border-left-color: var(--agent-decision); }
+        .agent-card.validation { border-left-color: var(--agent-validation); }
+        .agent-card.alert { border-left-color: var(--agent-alert); }
+        .agent-card.main { border-left-color: var(--agent-main); }
+
+        .agent-responsibilities {
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .agent-responsibilities strong {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .agent-responsibilities ul {
+            list-style: none;
+            margin: 0;
+        }
+
+        .agent-responsibilities li {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm) 0;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .agent-responsibilities i {
+            font-size: 0.625rem;
+            flex-shrink: 0;
+        }
+
+        /* ============================================
+           PIPELINE & DIAGRAM
+           ============================================ */
+        .pipeline-container {
+            overflow-x: auto;
+            padding: var(--spacing-md) 0;
+        }
+
+        .pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--spacing-lg);
+            min-width: min-content;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .pipeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-md);
+            text-align: center;
+            flex-shrink: 0;
+            animation: slideIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pipeline-step:nth-child(1) { animation-delay: 0.1s; }
+        .pipeline-step:nth-child(2) { animation-delay: 0.2s; }
+        .pipeline-step:nth-child(3) { animation-delay: 0.3s; }
+        .pipeline-step:nth-child(4) { animation-delay: 0.4s; }
+        .pipeline-step:nth-child(5) { animation-delay: 0.5s; }
+        .pipeline-step:nth-child(6) { animation-delay: 0.6s; }
+        .pipeline-step:nth-child(7) { animation-delay: 0.7s; }
+
+        .pipeline-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-xl);
+            font-size: 1.75rem;
+            transition: all var(--transition-base);
+        }
+
+        .pipeline-step:nth-child(1) .pipeline-icon { background: rgba(13, 110, 253, 0.1); color: var(--primary); }
+        .pipeline-step:nth-child(2) .pipeline-icon { background: rgba(6, 182, 212, 0.1); color: var(--agent-data); }
+        .pipeline-step:nth-child(3) .pipeline-icon { background: rgba(139, 92, 246, 0.1); color: var(--agent-decision); }
+        .pipeline-step:nth-child(4) .pipeline-icon { background: rgba(20, 184, 166, 0.1); color: var(--agent-validation); }
+        .pipeline-step:nth-child(5) .pipeline-icon { background: rgba(244, 63, 94, 0.1); color: var(--agent-alert); }
+
+        .pipeline-step p {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+            flex-shrink: 0;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(4px); }
+        }
+
+        /* ============================================
+           SYSTEM STATUS
+           ============================================ */
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: var(--radius-xl);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .system-status i {
+            color: var(--success);
+            font-size: 1.25rem;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                padding: var(--spacing-lg);
+                border-radius: var(--radius-xl);
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: var(--spacing-lg);
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline {
+                flex-wrap: wrap;
+                gap: var(--spacing-md);
+            }
+
+            .pipeline-arrow {
+                display: none;
+            }
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .text-muted {
+            color: var(--text-secondary);
+        }
+
+        .text-muted-light {
+            color: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-heartbeat"></i>
+                <h1>Medical AI</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-stethoscope"></i>
+                            <span>Diagnosis</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/statistics">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Statistics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/agents">
+                            <i class="fas fa-robot"></i>
+                            <span>Agents Status</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-network-wired"></i>
+                    <span>Multi-Agent System</span>
+                </div>
+                <p class="page-subtitle">Real-time monitoring of pneumonia detection agents</p>
+            </div>
+
+            <!-- Agents Grid -->
+            <div class="agents-grid">
+                <!-- DataAgent Card -->
+                <div class="card agent-card data">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-database"></i>
+                            DataAgent
+                        </h5>
+                        <p class="card-text">Handles incoming chest X-ray images and validation</p>
+                        <span class="badge badge-success">
+                            <i class="fas fa-circle"></i>
+                            Active
+                        </span>
+                        <div class="agent-responsibilities">
+                            <strong>Key Responsibilities</strong>
+                            <ul>
+                                <li><i class="fas fa-arrow-right"></i>Receive image uploads</li>
+                                <li><i class="fas fa-arrow-right"></i>Validate image format</li>
+                                <li><i class="fas fa-arrow-right"></i>Route to MedicalDecisionAgent</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MedicalDecisionAgent Card -->
+                <div class="card agent-card decision">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-brain"></i>
+                            MedicalDecisionAgent
+                        </h5>
+                        <p class="card-text">Calls Flask API for CNN pneumonia detection</p>
+                        <span class="badge badge-success">
+                            <i class="fas fa-circle"></i>
+                            Active
+                        </span>
+                        <div class="agent-responsibilities">
+                            <strong>Key Responsibilities</strong>
+                            <ul>
+                                <li><i class="fas fa-arrow-right"></i>Call Flask ML model</li>
+                                <li><i class="fas fa-arrow-right"></i>Process predictions</li>
+                                <li><i class="fas fa-arrow-right"></i>Save results to JSON</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ValidationAgent Card -->
+                <div class="card agent-card validation">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-check-double"></i>
+                            ValidationAgent
+                        </h5>
+                        <p class="card-text">Validates confidence levels and medical decisions</p>
+                        <span class="badge badge-success">
+                            <i class="fas fa-circle"></i>
+                            Active
+                        </span>
+                        <div class="agent-responsibilities">
+                            <strong>Key Responsibilities</strong>
+                            <ul>
+                                <li><i class="fas fa-arrow-right"></i>Assess confidence levels</li>
+                                <li><i class="fas fa-arrow-right"></i>Validate predictions</li>
+                                <li><i class="fas fa-arrow-right"></i>Route high-risk cases to AlertAgent</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AlertAgent Card -->
+                <div class="card agent-card alert">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-exclamation-circle"></i>
+                            AlertAgent
+                        </h5>
+                        <p class="card-text">Sends critical alerts for high-risk detections</p>
+                        <span class="badge badge-success">
+                            <i class="fas fa-circle"></i>
+                            Active
+                        </span>
+                        <div class="agent-responsibilities">
+                            <strong>Key Responsibilities</strong>
+                            <ul>
+                                <li><i class="fas fa-arrow-right"></i>Monitor high-risk cases</li>
+                                <li><i class="fas fa-arrow-right"></i>Send notifications</li>
+                                <li><i class="fas fa-arrow-right"></i>Log critical alerts</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MainAgent Card -->
+                <div class="card agent-card main">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-link"></i>
+                            MainAgent
+                        </h5>
+                        <p class="card-text">Orchestrates multi-agent workflow</p>
+                        <span class="badge badge-success">
+                            <i class="fas fa-circle"></i>
+                            Active
+                        </span>
+                        <div class="agent-responsibilities">
+                            <strong>Key Responsibilities</strong>
+                            <ul>
+                                <li><i class="fas fa-arrow-right"></i>Gateway for all requests</li>
+                                <li><i class="fas fa-arrow-right"></i>Store and retrieve results</li>
+                                <li><i class="fas fa-arrow-right"></i>Coordinate agent interactions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processing Pipeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-sitemap"></i>
+                        Processing Pipeline
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="pipeline-container">
+                        <div class="pipeline">
+                            <div class="pipeline-step">
+                                <div class="pipeline-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <p>User Upload</p>
+                            </div>
+                            <div class="pipeline-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="pipeline-step">
+                                <div class="pipeline-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <p>DataAgent</p>
+                            </div>
+                            <div class="pipeline-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="pipeline-step">
+                                <div class="pipeline-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <p>MedicalDecisionAgent</p>
+                            </div>
+                            <div class="pipeline-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="pipeline-step">
+                                <div class="pipeline-icon">
+                                    <i class="fas fa-check-double"></i>
+                                </div>
+                                <p>ValidationAgent</p>
+                            </div>
+                            <div class="pipeline-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="pipeline-step">
+                                <div class="pipeline-icon">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <p>AlertAgent</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="system-status">
+                <i class="fas fa-check-circle"></i>
+                <span>All agents are operational. System is ready for pneumonia detection analysis.</span>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

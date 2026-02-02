@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>History - Medical AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0a58ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-xl: 1rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .app-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-xl);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+            padding-bottom: var(--spacing-xl);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-brand i { font-size: 1.75rem; color: #ff6b6b; }
+        .sidebar-brand h1 { font-size: 1.25rem; font-weight: 700; }
+        .nav-menu { list-style: none; }
+        .nav-item { margin-bottom: 0.5rem; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 0.75rem;
+            transition: all var(--transition-base);
+            font-weight: 500;
+        }
+
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.15); color: white; }
+        .nav-link.active { background-color: rgba(255, 255, 255, 0.25); color: white; }
+        .nav-link i { font-size: 1.125rem; width: 20px; }
+
+        .main-content { flex: 1; margin-left: 260px; padding: var(--spacing-2xl); }
+        .page-header { margin-bottom: var(--spacing-2xl); }
+        .page-title { font-size: 2.5rem; font-weight: 700; display: flex; align-items: center; gap: var(--spacing-lg); }
+        .page-title i { color: var(--primary); }
+        .page-subtitle { font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
+
+        .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+        }
+
+        .card:hover { box-shadow: var(--shadow-lg); }
+        .card-header {
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h5 { font-size: 1.125rem; font-weight: 600; margin: 0; }
+        .card-body { padding: var(--spacing-lg); }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem var(--spacing-md);
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        table { margin: 0; }
+        thead { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
+        thead th { color: white; font-weight: 600; border: none; padding: var(--spacing-md); }
+        tbody td { vertical-align: middle; padding: var(--spacing-md); border-color: var(--border-color); }
+        tbody tr:hover { background-color: var(--bg-secondary); }
+
+        .progress { height: 22px; }
+        .progress-bar { display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem; }
+
+        .form-control, .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.5rem var(--spacing-md);
+            font-size: 0.875rem;
+        }
+
+        .card:has(table) {
+          width: 100%;
+       }
+
+.card:has(table) .card-body {
+    padding: 0;
+}
+
+.card:has(table) table {
+    width: 100%;
+}
+
+        .btn { border-radius: 0.75rem; font-weight: 600; }
+        .btn-primary { background: var(--primary); border: none; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); border: none; }
+        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+
+        .pagination .page-link { color: var(--primary); border-color: var(--border-color); }
+        .pagination .page-item.active .page-link { background: var(--primary); border-color: var(--primary); }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                margin-bottom: var(--spacing-xl);
+            }
+            .main-content { margin-left: 0; padding: var(--spacing-lg); }
+            .page-title { font-size: 1.75rem; }
+            .table-responsive { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-heartbeat"></i>
+                <h1>Medical AI</h1>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-stethoscope"></i><span>Diagnosis</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/statistics"><i class="fas fa-chart-bar"></i><span>Statistics</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/history"><i class="fas fa-history"></i><span>History</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/agents"><i class="fas fa-robot"></i><span>Agents Status</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-history"></i>
+                    <span>Analysis History</span>
+                </div>
+                <p class="page-subtitle">All pneumonia detection analyses performed</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="row mb-4" style="gap: var(--spacing-lg);">
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-filter"></i> Filter by Prediction</label>
+                    <select id="predictionFilter" class="form-select">
+                        <option value="">All</option>
+                        <option value="NORMAL">Normal</option>
+                        <option value="PNEUMONIA">Pneumonia</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-percentage"></i> Min Confidence (%)</label>
+                    <input type="number" id="confidenceFilter" class="form-control" min="0" max="100" placeholder="0-100">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-tag"></i> Status</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All</option>
+                        <option value="Valid">Valid</option>
+                        <option value="Uncertain">Uncertain</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="refreshBtn" class="btn btn-primary btn-sm" style="flex: 1;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button id="exportBtn" class="btn btn-success btn-sm" style="flex: 1;">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Image ID</th>
+                                    <th>Prediction</th>
+                                    <th>Confidence</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr><td colspan="6" class="text-center" style="color: var(--text-secondary);">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center" id="pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-stethoscope"></i> Analysis Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Image ID:</strong> <span id="modalImageId"></span></p>
+                            <p><strong>Prediction:</strong> <span id="modalPrediction"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Confidence:</strong> <span id="modalConfidence"></span></p>
+                            <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Confidence Level</h6>
+                        <div class="progress">
+                            <div id="modalConfidenceBar" class="progress-bar" role="progressbar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const ITEMS_PER_PAGE = 5;
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+
+        async function loadData() {
+            try {
+                const response = await fetch('/history/data');
+                allData = await response.json();
+                applyFilters();
+            } catch (error) {
+                document.getElementById('tableBody').innerHTML =
+                    '<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>';
+            }
+        }
+
+        function applyFilters() {
+            const prediction = document.getElementById('predictionFilter').value;
+            const minConfidence = parseFloat(document.getElementById('confidenceFilter').value) || 0;
+            const status = document.getElementById('statusFilter').value;
+
+            filteredData = allData.filter(item => {
+                const matchPrediction = !prediction || item.prediction === prediction;
+                const matchConfidence = (item.confidence * 100) >= minConfidence;
+                const matchStatus = !status || item.status === status;
+                return matchPrediction && matchConfidence && matchStatus;
+            });
+
+            currentPage = 1;
+            renderTable();
+            renderPagination();
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const pageData = filteredData.slice(start, end);
+
+            const tbody = document.getElementById('tableBody');
+            if (!pageData.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--text-secondary);">No records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pageData.map(item => `
+                <tr>
+                    <td>${item.image_id}</td>
+                    <td><span class="badge ${item.prediction === 'NORMAL' ? 'badge-success' : 'badge-warning'}">${item.prediction}</span></td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-bar ${item.confidence >= 0.8 ? 'bg-success' : (item.confidence >= 0.6 ? 'bg-warning' : 'bg-danger')}"
+                                 style="width: ${(item.confidence * 100).toFixed(2)}%;">
+                                ${(item.confidence * 100).toFixed(2)}%
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge ${item.status === 'Valid' ? 'badge-success' : 'badge-warning'}">${item.status}</span></td>
+                    <td>${new Date(item.timestamp).toLocaleString()}</td>
+                    <td><button class="btn btn-info btn-sm" onclick="viewDetail('${btoa(JSON.stringify(item))}')"><i class="fas fa-eye"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            const pagination = document.getElementById('pagination');
+            if (totalPages <= 1) { pagination.innerHTML = ''; return; }
+
+            pagination.innerHTML = Array.from({length: totalPages}, (_, i) => `
+                <li class="page-item ${i+1 === currentPage ? 'active' : ''}">
+                    <button class="page-link" onclick="goToPage(${i+1})">${i+1}</button>
+                </li>
+            `).join('');
+        }
+
+        function goToPage(page) { currentPage = page; renderTable(); renderPagination(); }
+
+        function viewDetail(encodedData) {
+            const item = JSON.parse(atob(encodedData));
+            document.getElementById('modalImageId').textContent = item.image_id;
+            document.getElementById('modalPrediction').innerHTML = `<span class="badge ${item.prediction === 'NORMAL' ? 'badge-success' : 'badge-warning'}">${item.prediction}</span>`;
+            document.getElementById('modalConfidence').innerHTML = `<span class="badge ${item.confidence >= 0.8 ? 'badge-success' : (item.confidence >= 0.6 ? 'badge-warning' : 'badge-danger')}">${(item.confidence*100).toFixed(2)}%</span>`;
+            document.getElementById('modalStatus').innerHTML = `<span class="badge ${item.status === 'Valid' ? 'badge-success' : 'badge-warning'}">${item.status}</span>`;
+            const confBar = document.getElementById('modalConfidenceBar');
+            confBar.style.width = (item.confidence*100)+'%';
+            confBar.className = `progress-bar ${item.confidence >= 0.8 ? 'bg-success' : (item.confidence >= 0.6 ? 'bg-warning' : 'bg-danger')}`;
+            confBar.textContent = (item.confidence*100).toFixed(2)+'%';
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+        }
+
+        function exportCSV() {
+            const headers = ['Image ID','Prediction','Confidence','Status'];
+            const rows = filteredData.map(item=>[item.image_id,item.prediction,(item.confidence*100).toFixed(2),item.status]);
+            let csv = headers.join(',')+'\n'+rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+            const blob = new Blob([csv],{type:'text/csv'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'history.csv';
+            a.click();
+        }
+
+        document.getElementById('predictionFilter').addEventListener('change', applyFilters);
+        document.getElementById('confidenceFilter').addEventListener('input', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('refreshBtn').addEventListener('click', loadData);
+        document.getElementById('exportBtn').addEventListener('click', exportCSV);
+
+        loadData();
+    </script>
+</body>
+</html>

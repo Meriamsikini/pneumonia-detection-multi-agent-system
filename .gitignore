@@ -1,0 +1,20 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+
+# Virtualenvs
+venv/
+.env/
+
+# Editor
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large model/data files
+*.h5
+*.pt
+data/
+models/

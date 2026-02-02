@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Medical AI - Pneumonia Detection System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0a58ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-xl: 1rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .app-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-xl);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+            padding-bottom: var(--spacing-xl);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-brand i { font-size: 1.75rem; color: #ff6b6b; }
+        .sidebar-brand h1 { font-size: 1.25rem; font-weight: 700; }
+        .nav-menu { list-style: none; }
+        .nav-item { margin-bottom: 0.5rem; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 0.75rem;
+            transition: all var(--transition-base);
+            font-weight: 500;
+        }
+
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.15); color: white; }
+        .nav-link.active { background-color: rgba(255, 255, 255, 0.25); color: white; }
+        .nav-link i { font-size: 1.125rem; width: 20px; }
+
+        .main-content { flex: 1; margin-left: 260px; padding: var(--spacing-2xl); }
+        .page-header { margin-bottom: var(--spacing-2xl); }
+        .page-title { font-size: 2.5rem; font-weight: 700; display: flex; align-items: center; gap: var(--spacing-lg); }
+        .page-title i { color: var(--primary); }
+        .page-subtitle { font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
+
+        .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+        }
+
+        .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+        .card-header {
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h3 { font-size: 1.25rem; font-weight: 600; margin: 0; }
+        .card-body { padding: var(--spacing-lg); }
+
+        .form-label { font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .form-control, .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem var(--spacing-md);
+            font-size: 0.875rem;
+            transition: all var(--transition-base);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .btn {
+            border-radius: 0.75rem;
+            font-weight: 600;
+            padding: 0.75rem var(--spacing-lg);
+            transition: all var(--transition-base);
+            border: none;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-lg { font-size: 1rem; padding: 1rem var(--spacing-lg); }
+
+        .image-preview {
+            max-height: 300px;
+            border-radius: var(--radius-xl);
+            border: 2px solid var(--border-color);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .form-text { font-size: 0.8125rem; color: var(--text-secondary); }
+
+        .agent-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            text-align: center;
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+        }
+
+        .agent-box i { font-size: 2rem; margin-bottom: var(--spacing-md); display: block; }
+        .agent-box strong { display: block; font-size: 1rem; margin-bottom: 0.5rem; }
+        .agent-box small { opacity: 0.9; }
+        .agent-box {
+    padding: 0.75rem 0.5rem;      /* réduit la hauteur interne */
+    min-height: auto;             /* supprime toute hauteur forcée */
+    margin-bottom: 1rem;  /* espace vertical entre chaque box */
+}
+
+.agent-box i {
+    font-size: 1.6rem;            /* légèrement plus petit */
+    margin-bottom: 0.3rem;        /* réduit l’espace vertical */
+    display: block;
+    
+}
+
+.agent-box strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;        /* réduit encore la hauteur */
+    line-height: 1.1;
+}
+
+.agent-box small {
+    opacity: 0.9;
+    line-height: 1.1;             /* texte plus compact */
+}
+
+        
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                margin-bottom: var(--spacing-xl);
+            }
+            .main-content { margin-left: 0; padding: var(--spacing-lg); }
+            .page-title { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-heartbeat"></i>
+                <h1>Medical AI</h1>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fas fa-stethoscope"></i><span>Diagnosis</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/statistics"><i class="fas fa-chart-bar"></i><span>Statistics</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="fas fa-history"></i><span>History</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/agents"><i class="fas fa-robot"></i><span>Agents Status</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>Pneumonia Diagnosis</span>
+                </div>
+                <p class="page-subtitle">Upload a chest X-ray image for AI analysis</p>
+            </div>
+
+            <!-- Upload Card -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-image"></i> Upload Chest X-Ray for Analysis</h3>
+                        </div>
+                        <div class="card-body">
+                            <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">
+                                        <i class="fas fa-file-upload"></i> Select X-Ray Image
+                                    </label>
+                                    <input type="file" class="form-control" id="image" name="image" 
+                                           accept="image/jpeg,image/png,image/jpg" required>
+                                    <div class="form-text">Supported formats: JPEG, PNG, JPG (max 10MB)</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div id="imagePreview"></div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
+                                        <i class="fas fa-microscope"></i> Analyze Image
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Status -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-robot"></i> Multi-Agent System Status</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row" style="gap: var(--spacing-lg);">
+                        <div class="col-md-3">
+                            <div class="agent-box">
+                                <i class="fas fa-database"></i>
+                                <strong>DataAgent</strong>
+                                <small>Processing JPEG/PNG/JPG images</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="agent-box">
+                                <i class="fas fa-check-circle"></i>
+                                <strong>ValidationAgent</strong>
+                                <small>Validating predictions</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="agent-box">
+                                <i class="fas fa-brain"></i>
+                                <strong>MedicalDecisionAgent</strong>
+                                <small>Making decisions</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="agent-box">
+                                <i class="fas fa-bell"></i>
+                                <strong>AlertAgent</strong>
+                                <small>Generating alerts</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Preview">`;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        });
+    </script>
+</body>
+</html>
