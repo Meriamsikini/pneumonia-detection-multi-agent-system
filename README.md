@@ -199,6 +199,9 @@ This project demonstrates:
 * Full-stack AI application development
 
 ---
+![Java](https://img.shields.io/badge/Java-17-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-3.x-green)
 
 
 ## 👤 Author
