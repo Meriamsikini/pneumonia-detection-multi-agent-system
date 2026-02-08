@@ -66,7 +66,7 @@ AlertAgent (high-risk cases)
 pneumonia-project/
 ├─ cnn_pneumonia_training.ipynb
 ├─ python_api/
-│  └─ predict.py
+│  └─ app.py
 └─ pneumonia-project/
    ├─ pom.xml
    ├─ libs/
@@ -74,8 +74,8 @@ pneumonia-project/
    │  └─ commons-codec-1.18.0.jar
    ├─ data/
    │  ├─ test_predictions.json
-   │  ├─ chest-x-ray_predictions.json
-   │  └─ chest-x-ray_predictions.csv
+   │  └─ chest-x-ray.json
+   │
    ├─ uploads/
    └─ src/
       └─ main/
