@@ -31,6 +31,8 @@ The system allows a user to upload a chest X-ray image via a web interface, proc
   * Training accuracy ≈ **98%**
   * Validation accuracy fluctuates due to dataset imbalance and limited validation size
 
+* **Trained model download**: [Modèle CNN Pneumonia (Google Drive)](https://drive.google.com/file/d/1DKKZagH73Qv8atL6lqE-wHWf_WsUE7cX/view?usp=drive_link)
+
 * **Notebook**:
 
   * `cnn_pneumonia_training.ipynb` – model training, evaluation, and testing
