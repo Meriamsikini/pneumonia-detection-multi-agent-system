@@ -208,6 +208,6 @@ This project demonstrates:
 
 ## 👤 Author
 
-**Meriem Sikini**
+**Meriam Sikini**
 Master’s Student – Big Data, AI & Advanced Applications
 📍 Morocco
